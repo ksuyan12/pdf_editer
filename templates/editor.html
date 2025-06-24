@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="mb-3">
+  <input id="text" class="form-control" placeholder="Text to insert">
+</div>
+<div id="viewer"></div>
+<div class="mt-3">
+  <button class="btn btn-success" onclick="save()">Save</button>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script>
+const edits = [];
+const url = '/get_pdf/{{ file_id }}';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+function render() {
+  pdfjsLib.getDocument(url).promise.then(pdf => {
+    const viewer = document.getElementById('viewer');
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      pdf.getPage(pageNum).then(page => {
+        const viewport = page.getViewport({scale:1.5});
+        const div = document.createElement('div');
+        div.id = 'page-' + (pageNum-1);
+        div.className = 'position-relative mb-2';
+        const canvas = document.createElement('canvas');
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        div.appendChild(canvas);
+        viewer.appendChild(div);
+        page.render({canvasContext: canvas.getContext('2d'), viewport: viewport});
+        canvas.addEventListener('click', e => {
+          const rect = canvas.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = canvas.height - (e.clientY - rect.top);
+          const text = document.getElementById('text').value;
+          if (!text) return;
+          addMark(div, text, x, y);
+          edits.push({page: pageNum-1, x: x, y: y, text: text});
+        });
+      });
+    }
+  });
+}
+
+function addMark(container, text, x, y) {
+  const span = document.createElement('span');
+  span.textContent = text;
+  span.style.position = 'absolute';
+  span.style.left = x + 'px';
+  span.style.bottom = y + 'px';
+  span.style.color = 'red';
+  container.appendChild(span);
+}
+
+function save() {
+  fetch('/apply_edits/{{ file_id }}', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({edits: edits})
+  }).then(r => r.blob()).then(b => {
+    const url = URL.createObjectURL(b);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'edited.pdf'; a.click();
+    URL.revokeObjectURL(url);
+  });
+}
+
+render();
+</script>
+{% endblock %}

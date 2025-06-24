@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row g-4">
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Merge PDFs</div>
+      <div class="card-body">
+        <form action="/merge" method="post" enctype="multipart/form-data">
+          <input class="form-control mb-3" type="file" name="files" multiple required>
+          <button class="btn btn-primary" type="submit">Merge</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Split PDF</div>
+      <div class="card-body">
+        <form action="/split" method="post" enctype="multipart/form-data">
+          <input class="form-control mb-3" type="file" name="file" required>
+          <input class="form-control mb-3" type="number" name="start" placeholder="Start page" min="0">
+          <input class="form-control mb-3" type="number" name="end" placeholder="End page">
+          <button class="btn btn-primary" type="submit">Split</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Rotate Pages</div>
+      <div class="card-body">
+        <form action="/rotate" method="post" enctype="multipart/form-data">
+          <input class="form-control mb-3" type="file" name="file" required>
+          <input class="form-control mb-3" type="number" name="angle" value="90" required>
+          <button class="btn btn-primary" type="submit">Rotate</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Remove Pages</div>
+      <div class="card-body">
+        <form action="/remove" method="post" enctype="multipart/form-data">
+          <input class="form-control mb-3" type="file" name="file" required>
+          <input class="form-control mb-3" type="text" name="pages" placeholder="Pages (comma-separated)">
+          <button class="btn btn-primary" type="submit">Remove</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Add Text</div>
+      <div class="card-body">
+        <form action="/add_text" method="post" enctype="multipart/form-data">
+          <input class="form-control mb-3" type="file" name="file" required>
+          <input class="form-control mb-3" type="text" name="text" placeholder="Text" required>
+          <input class="form-control mb-3" type="number" name="x" value="100" step="any">
+          <input class="form-control mb-3" type="number" name="y" value="750" step="any">
+          <input class="form-control mb-3" type="number" name="page" value="0">
+          <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Apply Watermark</div>
+      <div class="card-body">
+        <form action="/watermark" method="post" enctype="multipart/form-data">
+          <input class="form-control mb-3" type="file" name="file" required>
+          <input class="form-control mb-3" type="file" name="watermark" required>
+          <button class="btn btn-primary" type="submit">Apply</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card h-100">
+      <div class="card-header">Advanced Editor</div>
+      <div class="card-body d-flex align-items-center">
+        <a class="btn btn-success w-100" href="/edit">Launch Editor</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
